@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="7a0fe1a6-2948-487b-bd19-54c877e0f742" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="dataweaveassignment5Flow" doc:id="6f1f84b1-c57e-4802-b5cc-698c90bc529a" >
+		<http:listener doc:name="postMultipleFlights" doc:id="f8955b13-a4cd-4f66-878d-144d0b2850fb" config-ref="HTTP_Listener_config" path="/multipleflights" allowedMethods="POST"/>
+		<ee:transform doc:name="Transform Message" doc:id="2b360e4d-3a22-4410-b542-ab80a371b853" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map $]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="dwformat" ><![CDATA[%dw 2.0
+output application/dw
+---
+payload map 
+{
+	flight:$$,
+	($$):$
+}]]></ee:set-variable>
+				<ee:set-variable variableName="jsonformat" ><![CDATA[%dw 2.0
+output application/json
+---
+payload map(object, index) ->
+{
+	'flight$(index)':object
+}]]></ee:set-variable>
+				<ee:set-variable variableName="mapexample1" ><![CDATA[%dw 2.0
+output application/json
+---
+payload map $]]></ee:set-variable>
+				<ee:set-variable variableName="mapexample2" ><![CDATA[%dw 2.0
+output application/json
+---
+payload map
+{'flight':$$
+	
+}]]></ee:set-variable>
+				<ee:set-variable variableName="mapexample3" ><![CDATA[%dw 2.0
+output application/json
+---
+payload map 
+{
+	'flight':$$,
+	'destination':$.toAirportCode
+}]]></ee:set-variable>
+				<ee:set-variable variableName="mapexample4" ><![CDATA[%dw 2.0
+output application/json
+---
+payload map 
+{
+	flight:$$,
+	($$):$
+}]]></ee:set-variable>
+				<ee:set-variable variableName="mapexample5" ><![CDATA[%dw 2.0
+output application/json
+---
+payload map {
+	'flight$$':$
+}]]></ee:set-variable>
+				<ee:set-variable variableName="mapexample6" ><![CDATA[%dw 2.0
+output application/json
+---
+payload map(object, index) ->
+{
+	(index):object
+}]]></ee:set-variable>
+				<ee:set-variable variableName="mapexample7" ><![CDATA[%dw 2.0
+output application/json
+---
+payload map(object,index) ->
+{
+	'flight$(index)':object
+}]]></ee:set-variable>
+				<ee:set-variable variableName="javaexample8" ><![CDATA[%dw 2.0
+output application/java
+---
+payload map(object,index) ->
+{
+	'flight$(index)':object
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="509addf5-e597-4fc5-bff6-e0216aab3de7" />
+	</flow>
+	<flow name="convertjsontoxml" doc:id="6e126683-ec25-48f5-8572-3e8e91f673cf" >
+		<http:listener doc:name="convertjsontoxml" doc:id="b35da4b6-7430-471b-8434-8114735ee5ff" config-ref="HTTP_Listener_config" path="/convertjsontoxml" allowedMethods="POST" />
+		<ee:transform doc:name="Transform Message" doc:id="9e64a50a-d7fd-47fd-8ebc-c6ef2343bb16" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+flights: {(payload map(object, index)->
+{
+	'flight$(index)':object
+})}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="jsontoxml1" ><![CDATA[%dw 2.0
+output application/xml
+---
+flights: {(payload map (object,index) -> {
+
+    'flight': object
+
+    }
+
+)}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="30cdc416-a24d-4e65-bae7-4f335f1bc62b" />
+	</flow>
+	<flow name="convertxmltoxml" doc:id="c566b754-cb51-4dcb-9004-f076be6fc54d" >
+		<http:listener doc:name="convertxmltoxml" doc:id="21382b2d-fbdd-4950-b028-bc1138a19bf8" config-ref="HTTP_Listener_config" path="/convertxmltoxml"/>
+		<ee:transform doc:name="Transform Message" doc:id="0b04f45e-36f5-41ac-9c4c-7cbf2831a527" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="xmltoxml1" ><![CDATA[%dw 2.0
+output application/xml
+---
+flights: {(payload..return map(object,index) ->
+{
+	flight:object
+})}]]></ee:set-variable>
+				<ee:set-variable variableName="xmltoxml2" ><![CDATA[%dw 2.0
+output application/xml
+---
+flights: {(payload..*return map(object,index) ->
+{
+	flight:object
+})}]]></ee:set-variable>
+				<ee:set-variable variableName="xmltoxml3" ><![CDATA[%dw 2.0
+output application/xml
+---
+flights: {(payload..*return map(object,index) ->
+{
+	flight:{
+		'destination':object.destination,
+		'price':object.price
+	}
+})}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="dc115909-8de8-446a-a9d5-ac330491cf7a" />
+	</flow>
+	<flow name="dataweaveexpressionexample" doc:id="42791e1a-7511-4102-8df8-121db8420f80" >
+		<http:listener doc:name="dataweaveexample" doc:id="71af04e6-97d8-4d78-8d83-93a161202d3f" config-ref="HTTP_Listener_config" path="/dataweaveexample" allowedMethods="POST"/>
+		<ee:transform doc:name="Transform Message" doc:id="b64579fe-8597-4b39-9f89-3dd95f1ef309" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+var totalseats = 400
+---
+flights: payload..*return map(object, index)->
+{
+	dest:object.destination,
+	price:object.price,
+	totalseats: totalseats
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="globalvariableaslambda" ><![CDATA[%dw 2.0
+output application/dw
+
+var numseats=(x=500) -> x
+---
+
+flights: payload..*return map(object,index) ->
+{
+	price:numseats(),
+	dest:object.destination
+}
+]]></ee:set-variable>
+				<ee:set-variable variableName="lambdainputparam" ><![CDATA[%dw 2.0
+output application/dw
+
+//use of variable as lambda expression
+var emptyseats =(seats: String) ->
+	if(seats contains('40'))
+	100
+	else
+	400
+	
+fun updateDestination(dest:String)=
+if(dest contains('SFO'))
+'San'
+else
+'None'	
+---
+lift:payload..*return map(object,index)->
+{
+	seats:emptyseats(object.emptySeats),
+	seats:updateDestination(object.destination)
+}]]></ee:set-variable>
+				<ee:set-variable variableName="usingoperatorexample" ><![CDATA[%dw 2.0
+output application/dw
+
+fun getEmptySeats(emptySeats: String) =
+	if (emptySeats contains("40"))
+	400
+	else
+	500
+
+---
+using (flights = 
+	payload..*return map(object,index) ->
+	{
+	ww3:getEmptySeats(object.emptySeats),
+	price:object.price as Number ,
+	dest:object.destination,
+	date: object.departureDate as Date {format: "yyyy/MM/dd"} as String
+    }
+)
+
+flights]]></ee:set-variable>
+				<ee:set-variable variableName="createcustomdatatype" ><![CDATA[%dw 2.0
+output application/dw
+
+//type currency = String {format: "###:00"}
+type Currency = String {format: "###.000"}
+
+---
+using(flights=payload..*return map(object, index)->
+{
+	price:object.price as Number as Currency
+}	
+)
+flights]]></ee:set-variable>
+				<ee:set-variable variableName="objecttopojo" ><![CDATA[%dw 2.0
+output application/java
+type Currency=String{format:"###:000"}
+type Travel = Object{class: "dataweaveassignment5.Travel"}
+---
+
+using(travel=payload..*return map(object,index) ->
+	{
+		destination:object.destination,
+		price:object.price  as Currency,
+		planeType:upper(object.planeType as String)
+		
+	} as Travel
+)
+travel
+
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1c66a162-4a81-4c0f-8f81-2cf81a547a12" message="#[vars.objecttopojo]"/>
+	</flow>
+	<flow name="dataweavefunctions" doc:id="e2f9f61b-1c7b-4cf5-82e2-444d7296fb7e" >
+		<http:listener doc:name="dataweavefunctions" doc:id="44a4c9a9-9f14-440b-8d79-946e61aa7828" config-ref="HTTP_Listener_config" path="/dataweavefunctions"/>
+		<ee:transform doc:name="Transform Message" doc:id="60719a50-8edf-4ee5-a5b2-2723b844fe59" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+import dasherize from dw::core::Strings
+type Travel = Object{class: "dataweaveassignment5.Travel"}
+---
+payload map(object,index)->
+{
+	planeType: upper(replace(object.planeType,/(Boeing)/) with "Boeing Plane"),
+	destination:dasherize(object.toAirportCode)
+} as Travel
+]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="orderfunction" ><![CDATA[%dw 2.0
+output application/json
+
+---
+using (flights=payload map(object,index)->
+	{
+		price1:object.price,
+		planeType:object.planeType,
+		dedate:object.departureDate,
+		availableSeats1: object.emptySeats as Number
+	}
+)
+flights 
+filter ($.availableSeats1 !=0)
+orderBy $.price1 
+		]]></ee:set-variable>
+				<ee:set-variable variableName="flatternjoinbyexample" ><![CDATA[%dw 2.0
+var myData =
+{ user : [
+   {
+     group : "dev",
+     myarray : [
+       { name : "Shoki", id : 5678 },
+       { name : "Mariano", id : 9123 }
+     ]
+   }
+ ]
+}
+output application/json
+---
+flight:payload map(object,index)->
+{
+	sum: flatten(myData.user.myarray),
+	joinby1: ["a","b","c"] joinBy "-"
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="9c3fbadc-9ed7-4719-b5c3-a221f39974f4" />
+	</flow>
+	<flow name="jsontocsv" doc:id="cb3ca3de-7e2c-4220-80dd-e8ab689a0f55" >
+		<http:listener doc:name="jsontocsv" doc:id="19b47a8c-0e55-4a7c-90c9-872d55ad730b" config-ref="HTTP_Listener_config" path="/jsontocsv"/>
+		<ee:transform doc:name="Transform Message" doc:id="25ccf0b7-d1a5-45a5-84ea-35bfc8eba6aa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv
+---
+payload map(object,index)->
+{
+	airline:object.airline,
+	flightcode:object.flightCode
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
